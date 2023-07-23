@@ -1,5 +1,6 @@
 import winreg
 
+
 class RegManager:
     def __init__(self):
         self.key_path = r"Software\ScreenFrequency"
