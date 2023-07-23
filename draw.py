@@ -3,19 +3,20 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 class Draw:
-    def icon(self, number, is_plugged=None):
+    def icon(self, number, is_watch, is_plugged):
         size = (128, 128)
         background = (22, 22, 22, 230)
         corner_radius = 40
 
         font_family = "./src/impact.ttf"
         font_size = 72
-        color = "#555777"
+        color = "#999"
 
-        if is_plugged == True:
-            color = "#35C47D"
-        elif is_plugged == False:
-            color = "#C44D35"
+        if is_watch:
+            if is_plugged == True:
+                color = "#35C47D"
+            else:
+                color = "#C44D35"
 
         # Create a transparent background
         img = Image.new("RGBA", size, color=(0, 0, 0, 0))

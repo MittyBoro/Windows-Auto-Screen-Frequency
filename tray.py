@@ -2,18 +2,20 @@ import pystray
 from pystray import Menu, MenuItem as Item
 from draw import Draw
 from reg import RegManager
-import tkinter as tk
+from power import Power
 
 
 class Tray:
     app_name = ""
+    current_fq = 0
 
     def __init__(self, app_name, frequency):
         self.app_name = app_name
         self.reg = RegManager()
         self.frequency = frequency
 
-        self.is_working = self.reg.get("IsWorking")
+        self.is_watch = self.reg.get("Watch")
+        self.current_fq = self.frequency.current()
 
         self.start()
 
@@ -22,48 +24,59 @@ class Tray:
         menu = self.get_menu()
 
         # Создание объекта иконки в системном трее
-        self.icon = pystray.Icon("name", image, self.app_name, menu)
+        self.icon = pystray.Icon(self.app_name, image, self.app_name, menu)
         self.icon.run()
 
     def restart(self):
-        self.icon.stop()
-        self.start()
+        self.current_fq = self.frequency.current()
+        self.icon.icon = self.get_image()
 
     def get_image(self):
-        current_fq = self.frequency.current()
-        image = Draw().icon(current_fq)
+        image = Draw().icon(self.current_fq, self.is_watch, Power().is_plugged())
         return image
 
     def get_menu(self):
-        current_fq = self.frequency.current()
-
         def make_menu_item_handler(fq):
             def menu_item_handler(item):
                 self.set_fq_from_menu(fq)
 
             return menu_item_handler
 
+        def get_menu_item_handler(item):
+            return
+
         fq_list = self.frequency.available()
-        fq_submenu = [Item(f"{fq} гц", make_menu_item_handler(fq)) for fq in fq_list]
+        fq_submenu = [
+            Item(
+                f"{fq} гц",
+                make_menu_item_handler(fq),
+                checked=lambda item: item.text.find(str(self.current_fq)) == 0,
+                radio=True,
+            )
+            for fq in fq_list
+        ]
 
         menu = Menu(
-            Item("Автоизменение частоты", self.toggle_fq_setter, checked=lambda item: self.is_working),
-            Item("Доступные частоты", Menu(*fq_submenu)),
-            Item(f"Текущая частота {current_fq} гц", lambda icon, item: None),
-            Item("Закрыть", self.quit_window, default=True),
+            Item("Автоизменение частоты", self.toggle_setter, checked=lambda item: self.is_watch, default=True),
+            Menu.SEPARATOR,
+            *fq_submenu,
+            Menu.SEPARATOR,
+            Item("Закрыть", self.quit_window),
         )
 
         return menu
 
-    def toggle_fq_setter(self):
-        res = self.reg.toggle("IsWorking")
-        return res
+    def toggle_setter(self):
+        res = self.reg.toggle("Watch")
+        self.is_watch = res
+        self.frequency.set(int(Power().is_plugged()))
+        self.restart()
 
     def set_fq_from_menu(self, value):
-        self.reg.set("IsWorking", 0)
-        self.is_working = False
+        self.reg.set("Watch", 0)
+        self.is_watch = False
         self.frequency.set(value)
-        self.icon.icon = self.get_image()
+        self.restart()
 
     def quit_window(self, icon, item):
         icon.stop()
