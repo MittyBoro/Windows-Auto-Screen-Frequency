@@ -1,11 +1,12 @@
 import winreg
+import os
 
 
 class RegManager:
     def __init__(self):
-        self.key_path = r"Software\ScreenFrequency"
+        self.key_path = r"Software\AutoScreenFrequency"
 
-    def get(self, value_name):
+    def get(self, value_name, key_path=self.key_path):
         try:
             # Открываем ключ реестра
             registry_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, self.key_path, 0, winreg.KEY_READ)
@@ -19,10 +20,10 @@ class RegManager:
             # Если ключ или значение не найдены, возвращаем 0
             return 0
 
-    def set(self, value_name, value_data, type=winreg.REG_DWORD):
+    def set(self, value_name, value_data, key_path=self.key_path, type=winreg.REG_DWORD):
         try:
             # Создаем ключ реестра
-            key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, self.key_path)
+            key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, key_path)
             # Записываем значение
             winreg.SetValueEx(key, value_name, 0, type, value_data)
             # Закрываем ключ реестра

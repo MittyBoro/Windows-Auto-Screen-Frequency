@@ -2,14 +2,13 @@ import pystray
 from pystray import Menu, MenuItem as Item
 from draw import Draw
 from reg import RegManager
+import os
 
 
 class Tray:
-    app_name = ""
     current_fq = 0
 
-    def __init__(self, app_name, frequency, power):
-        self.app_name = app_name
+    def __init__(self, frequency, power):
         self.reg = RegManager()
         self.frequency = frequency
         self.power = power
@@ -19,7 +18,7 @@ class Tray:
 
         image = self.get_image()
         menu = self.get_menu()
-        self.icon = pystray.Icon(self.app_name, image, self.app_name, menu)
+        self.icon = pystray.Icon(os.getenv("APP_NAME"), image, os.getenv("APP_NAME"), menu)
 
     def run(self):
         self.icon.run()

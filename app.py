@@ -1,18 +1,20 @@
 import time
 import threading
+import dotenv
+
 
 from frequency import Frequency
 from power import Power
 from tray import Tray
 
+dotenv.load_dotenv()
+
 
 class App:
-    app_name = "Auto Screen Frequency"
-
     def __init__(self):
         self.frequency = Frequency()
         self.power = Power()
-        self.tray = Tray(self.app_name, self.frequency, self.power)
+        self.tray = Tray(self.frequency, self.power)
 
         self.tray_thread = threading.Thread(target=self.start_tray, args=(self.tray,))
 
