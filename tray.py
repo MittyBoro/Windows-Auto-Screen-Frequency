@@ -2,37 +2,38 @@ import pystray
 from pystray import Menu, MenuItem as Item
 from draw import Draw
 from reg import RegManager
-from power import Power
 
 
 class Tray:
     app_name = ""
     current_fq = 0
 
-    def __init__(self, app_name, frequency):
+    def __init__(self, app_name, frequency, power):
         self.app_name = app_name
         self.reg = RegManager()
         self.frequency = frequency
+        self.power = power
 
         self.is_watch = self.reg.get("Watch")
         self.current_fq = self.frequency.current()
 
-        self.start()
-
-    def start(self):
         image = self.get_image()
         menu = self.get_menu()
-
-        # Создание объекта иконки в системном трее
         self.icon = pystray.Icon(self.app_name, image, self.app_name, menu)
-        self.icon.run()
 
-    def restart(self):
+    def run(self):
+        self.icon.run()
+        self.icon.visible = False
+
+    def update(self, fq_is_changed=False):
+        if fq_is_changed:
+            self.frequency.set_by_power(self.power.is_plugged())
+
         self.current_fq = self.frequency.current()
         self.icon.icon = self.get_image()
 
     def get_image(self):
-        image = Draw().icon(self.current_fq, self.is_watch, Power().is_plugged())
+        image = Draw().icon(self.current_fq, self.is_watch, self.power.is_plugged())
         return image
 
     def get_menu(self):
@@ -68,15 +69,14 @@ class Tray:
 
     def toggle_setter(self):
         res = self.reg.toggle("Watch")
-        self.is_watch = res
-        self.frequency.set(int(Power().is_plugged()))
-        self.restart()
+        self.is_watch = bool(res)
+        self.update(self.is_watch)
 
     def set_fq_from_menu(self, value):
         self.reg.set("Watch", 0)
         self.is_watch = False
         self.frequency.set(value)
-        self.restart()
+        self.update()
 
     def quit_window(self, icon, item):
         icon.stop()

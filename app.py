@@ -1,33 +1,39 @@
-from power import Power
+import time
+import threading
 
-from tray import Tray
 from frequency import Frequency
+from power import Power
+from tray import Tray
 
 
 class App:
     app_name = "Auto Screen Frequency"
 
     def __init__(self):
-        self.power = Power()
         self.frequency = Frequency()
-        self.tray = Tray(self.app_name, self.frequency)
+        self.power = Power()
+        self.tray = Tray(self.app_name, self.frequency, self.power)
 
-    # def update_data(self):
-    #     # меняем инфу в начале
-    #     self.type_label.config(text=f"Тип питания: {self.power.text()}")
-    #     self.frequency_label.config(text=f"Частота экрана: {self.frequency.current()}Гц")
+        self.tray_thread = threading.Thread(target=self.start_tray, args=(self.tray,))
 
-    #     # меняем частоту экрана, если меняется тип питания
-    #     if self.power.is_changed():
-    #         self.set_frequency()
+        self.tray_thread.start()
 
-    #     self.root.after(2000, self.update_data)
+        self.watch()
 
-    def set_frequency(self):
-        if not self.power.is_plugged():
-            self.frequency.set_new(int(self.battery_entry.get()))
-        else:
-            self.frequency.set_new(int(self.plugged_entry.get()))
+    def start_tray(self, tray):
+        tray.run()
+
+    def watch(self):
+        time.sleep(1)  # дать время для tray.icon.visible
+        while self.tray.icon.visible:
+            if self.tray.is_watch:
+                self.runIteration()
+
+            time.sleep(2)
+
+    def runIteration(self):
+        if self.power.is_changed():
+            self.tray.update(True)
 
 
 app = App()

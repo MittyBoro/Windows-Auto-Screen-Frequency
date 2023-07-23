@@ -1,4 +1,3 @@
-import psutil
 import win32api
 import time
 
@@ -12,13 +11,19 @@ class Frequency:
         return rate
 
     def set(self, rate):
-        # if (self.current() == rate):
-        #     return
+        if self.current() == rate:
+            return
         win32api.ChangeDisplaySettings(None, 0)
         win32api.ChangeDisplaySettings(None, 0)
         dm = win32api.EnumDisplaySettings()
         dm.DisplayFrequency = rate
         win32api.ChangeDisplaySettings(dm, 0)
+
+    def set_by_power(self, is_plugged=False):
+        if is_plugged:
+            self.set(self.max())
+        else:
+            self.set(self.min())
 
     def available(self):
         if self.values:
