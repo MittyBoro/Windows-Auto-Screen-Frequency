@@ -2,7 +2,7 @@ import psutil
 
 
 class Power:
-    current = null
+    current = None
 
     def __init__(self):
         self.current = self.is_plugged()

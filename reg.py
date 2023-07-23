@@ -19,13 +19,18 @@ class RegManager:
             # Если ключ или значение не найдены, возвращаем 0
             return 0
 
-    def set(self, value_name, value_data):
+    def set(self, value_name, value_data, type=winreg.REG_DWORD):
         try:
             # Создаем ключ реестра
             key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, self.key_path)
             # Записываем значение
-            winreg.SetValueEx(key, value_name, 0, winreg.REG_DWORD, value_data)
+            winreg.SetValueEx(key, value_name, 0, type, value_data)
             # Закрываем ключ реестра
             winreg.CloseKey(key)
         except Exception as e:
             raise ValueError("Ошибка при записи значения в реестр:", e)
+
+    def toggle(self, value_name):
+        self.set(value_name, 1 - self.get(value_name))
+
+        return bool(self.get(value_name))

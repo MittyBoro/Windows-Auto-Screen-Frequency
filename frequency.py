@@ -1,17 +1,18 @@
 import psutil
 import win32api
+import time
 
 
 class Frequency:
-    values = null
-    current = null
+    values = None
 
     def current(self):
         dm = win32api.EnumDisplaySettings(None, -1)
-        return dm.DisplayFrequency
+        rate = dm.DisplayFrequency
+        return rate
 
-    def set_new(self, rate):
-        # if (self.current == rate):
+    def set(self, rate):
+        # if (self.current() == rate):
         #     return
         win32api.ChangeDisplaySettings(None, 0)
         win32api.ChangeDisplaySettings(None, 0)
@@ -20,8 +21,8 @@ class Frequency:
         win32api.ChangeDisplaySettings(dm, 0)
 
     def available(self):
-        if values:
-            return values
+        if self.values:
+            return self.values
 
         refresh_rates = set()
         device = 0  # Индекс монитора (0 для основного монитора)
@@ -36,8 +37,8 @@ class Frequency:
             except:
                 break
 
-        values = refresh_rates
-        return refresh_rates
+        self.values = refresh_rates
+        return sorted(refresh_rates)
 
     def min(self):
         return min(self.available())
