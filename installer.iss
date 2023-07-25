@@ -20,6 +20,3 @@ Root: HKCU; Subkey: "Software\AutoScreenFrequency"; Flags: uninsdeletevalue
 
 [Run]
 Filename: "{app}\AutoScreenFrequency.exe"; Description: "Запустить приложение"; Flags: nowait postinstall
-
-; pyinstaller --noconfirm --onefile --windowed --icon "./src/favicon.ico" --name "Auto Screen Frequency" --disable-windowed-traceback  "./app.py"
-; "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /a $p
