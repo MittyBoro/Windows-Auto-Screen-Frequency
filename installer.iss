@@ -1,6 +1,6 @@
 [Setup]
 AppName=Auto Screen Frequency
-AppVersion=1.0
+AppVersion=1.1
 DefaultDirName={autopf}\AutoScreenFrequency
 OutputBaseFilename=AutoScreenFrequencyInstall
 SignTool=MsSign $f

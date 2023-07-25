@@ -26,6 +26,7 @@ class App:
         tray.run()
 
     def watch(self):
+        self.tray.update(True)
         time.sleep(1)  # дать время для tray.icon.visible
         while self.tray.icon.visible:
             if self.tray.is_watch:

@@ -22,10 +22,9 @@ class Tray:
 
     def run(self):
         self.icon.run()
-        self.icon.visible = False
 
-    def update(self, fq_is_changed=False):
-        if fq_is_changed:
+    def update(self, power_is_changed=False):
+        if power_is_changed:
             self.frequency.set_by_power(self.power.is_plugged())
 
         self.current_fq = self.frequency.current()
@@ -79,3 +78,4 @@ class Tray:
 
     def quit_window(self, icon, item):
         icon.stop()
+        icon.visible = False
